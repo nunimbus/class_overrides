@@ -1,0 +1,27 @@
+56a57,59
+> use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+> use Symfony\Component\EventDispatcher\GenericEvent;
+> use OCP\EventDispatcher\IEventDispatcher;
+80a84,86
+> 	/** @var EventDispatcherInterface */
+> 	private $dispatcher;
+> 
+93a100
+> 		$this->dispatcher = \OC::$server->getEventDispatcher();
+287c294,307
+< 		$result = $this->queryBuilder->execute();
+---
+> 		$event = new GenericEvent($this);
+> 		$oldDispatcher = $this->dispatcher->dispatch('\OC\DB\QueryBuilder\QueryBuilder::preExecuteSql', $event);
+> 
+> 		$result = null;
+> 		$dispatcher = \OC_Hook::emit('QueryBuilder', 'preExecuteSql', ['queryBuilder' => &$this->queryBuilder, 'result' => &$result]);
+> 
+> 		if ($oldDispatcher->isPropagationStopped() && $event->getArguments()['result']) {
+> 			$result = $event->getArgument('result');
+> 		}
+> 
+> 		if ($result === null) {
+> 			$result = $this->queryBuilder->execute();
+> 		}
+> 
