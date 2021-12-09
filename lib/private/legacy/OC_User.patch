@@ -1,0 +1,13 @@
+181c181,185
+< 				$userSession->createSessionToken($request, $uid, $uid);
+---
+> 				$password = null;
+> 				if ($backend instanceof \OCP\Authentication\IProvideUserSecretBackend) {
+> 					$password = $backend->getCurrentUserSecret();
+> 				}
+> 				$userSession->createSessionToken($request, $uid, $uid, $password);
+193c197
+< 						'password' => null,
+---
+> 						'password' => $password,
+

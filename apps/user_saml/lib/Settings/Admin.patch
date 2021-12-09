@@ -1,0 +1,10 @@
+93c93,94
+< 			]
+---
+> 			],
+> 			'sloWebServerDecode' => $this->l10n->t('Retrieve query parameters from $_SERVER. Some SAML servers require this on SLO requests.'),
+233c234
+< }
+\ No newline at end of file
+---
+> }
