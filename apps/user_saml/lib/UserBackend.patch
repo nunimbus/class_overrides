@@ -84,7 +84,10 @@
 > 	    if ($this->checkUserSecretHash($uid, $password)) {
 > 			return $uid;
 >  		}
-502a549,558
+496a543,544
+> 			$uid = $this->userData->testEncodedObjectGUID($uid);
+> 
+502a551,560
 > 	/**
 > 	 * Optionally returns a stable per-user secret. This secret is for
 > 	 * instance used to secure file encryption keys.
@@ -95,7 +98,7 @@
 > 		$samlData = $this->session->get('user_saml.samlUserData');
 > 		return $this->getUserSecret($this->getCurrentUserId(), $samlData);
 > 	}
-600a657,671
+600a659,673
 > 	private function getUserSecret($uid, array $attributes) {
 > 		try {
 > 			$userSecret = $this->getAttributeValue('saml-attribute-mapping-user_secret_mapping', $attributes);
@@ -111,7 +114,11 @@
 > 		return null;
 > 	}
 > 
-675a747,753
+638c711
+< 			$currentEmail = (string)(method_exists($user, 'getSystemEMailAddress') ? $user->getSystemEMailAddress() : $user->getEMailAddress());
+---
+> 			$currentEmail = (string)$user->getEMailAddress();
+673a747,753
 > 				}
 > 			}
 > 
