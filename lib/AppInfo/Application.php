@@ -21,7 +21,7 @@
  *
  */
 
-namespace OCA\InternalOverrides\AppInfo;
+namespace OCA\ClassOverrides\AppInfo;
 
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -30,7 +30,7 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 class Application extends App implements IBootstrap {
 
-	public const APP_ID = 'internal_overrides';
+	public const APP_ID = 'class_overrides';
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);

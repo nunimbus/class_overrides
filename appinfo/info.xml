@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>internal_overrides</id>
-	<name>Internal Overrides</name>
+	<id>class_overrides</id>
+	<name>Class Overrides</name>
 	<summary>Override internal classes with custom code.</summary>
 	<description>This app allows developers to override internal classes with custom code without modifying core files.</description>
 	<version>1.0.0</version>
 	<licence>agpl</licence>
 	<author>Andrew Summers</author>
-	<namespace>InternalOverrides</namespace>
+	<namespace>ClassOverrides</namespace>
 	<default_enable/>
 	<types>
 		<prevent_group_restriction />
