@@ -35,7 +35,6 @@ do
   libPattern=$(echo "$file" | sed 's/^\.//g')
   newLibPattern="$appdir$libPattern"
   namespace=$(grep "^namespace " $file | cut -d ' ' -f 2 | sed 's/;$//g')
-  echo $newLibPattern
   
   grep -q "^class " $file
   if [[ $? -eq 1 ]]
