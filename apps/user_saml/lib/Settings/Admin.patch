@@ -1,10 +1,8 @@
-93c93,94
-< 			]
+134c134,138
+< 
 ---
-> 			],
-> 			'sloWebServerDecode' => $this->l10n->t('Retrieve query parameters from $_SERVER. Some SAML servers require this on SLO requests.'),
-233c234
-< }
-\ No newline at end of file
----
-> }
+>           'user_secret_mapping' => [
+>               'text' => $this->l10n->t('Attribute to use as user secret e.g. for the encryption app.'),
+>               'type' => 'line',
+>               'required' => false,
+>           ],
