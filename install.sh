@@ -18,7 +18,7 @@ find ./composer/composer/ -type f | xargs sed -i 's%ComposerAutoloaderInit[a-f0-
 
 
 # Every file should have a .sh script to apply patches
-for script in $(find ./lib/ -type f -name "*.sh" -not -path ./lib/AppInfo/*)
+for script in $(find -type f -name "*.sh" ! -name install.sh ! -path "./lib/AppInfo/*" ! -path "./composer/*")
 do
   # File being modified
   sourceLib=$(echo "${basedir}/$script" | sed 's/\.sh$/\.php/g')
@@ -30,7 +30,7 @@ do
   bash "$script"
 done
 
-for file in $(find ./lib/ -type f -name "*.php" -not -path ./lib/AppInfo/*)
+for file in $(find -type f -name "*.php" ! -path "./lib/AppInfo/*" ! -path "./composer/*")
 do
   libPattern=$(echo "$file" | sed 's/^\.//g')
   newLibPattern="$appdir$libPattern"
@@ -65,5 +65,5 @@ do
 done
 
 mv autoload.config.php "${basedir}/config/autoload.config.php"
-rm -r install.sh .git
+rm -rf install.sh .git
 
