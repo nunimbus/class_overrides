@@ -4,7 +4,6 @@ basedir=$(realpath $(pwd)/../../)
 appdir=$(echo ${PWD#$basedir} | sed "s%/$%%g")
 
 cp -r "${basedir}/lib/composer" .
-mv composer/composer/autoload_classmap.orig.php composer/composer/autoload_classmap.php ; mv composer/composer/autoload_static.orig.php composer/composer/autoload_static.php
 
 # autoload_classmap.php
 file="./composer/composer/autoload_classmap.php"
@@ -66,5 +65,5 @@ do
 done
 
 mv autoload.config.php "${basedir}/config/autoload.config.php"
-rm install.sh
+rm -r install.sh .git
 
