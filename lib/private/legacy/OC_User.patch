@@ -1,13 +1,32 @@
-181c181,185
-< 				$userSession->createSessionToken($request, $uid, $uid);
----
-> 				$password = null;
-> 				if ($backend instanceof \OCP\Authentication\IProvideUserSecretBackend) {
-> 					$password = $backend->getCurrentUserSecret();
-> 				}
-> 				$userSession->createSessionToken($request, $uid, $uid, $password);
-193c197
-< 						'password' => null,
----
-> 						'password' => $password,
-
+--- OC_User.php	2021-11-15 13:53:50.000000000 -0600
++++ OC_User.new.php	2021-12-24 10:49:23.393000000 -0600
+@@ -176,11 +176,15 @@
+ 					$message = \OC::$server->getL10N('lib')->t('User disabled');
+ 					throw new LoginException($message);
+ 				}
+ 				$userSession->setLoginName($uid);
+ 				$request = OC::$server->getRequest();
+-				$userSession->createSessionToken($request, $uid, $uid);
++				$password = null;
++				if ($backend instanceof \OCP\Authentication\IProvideUserSecretBackend) {
++					$password = $backend->getCurrentUserSecret();
++				}
++				$userSession->createSessionToken($request, $uid, $uid, $password);
+ 				// setup the filesystem
+ 				OC_Util::setupFS($uid);
+ 				// first call the post_login hooks, the login-process needs to be
+ 				// completed before we can safely create the users folder.
+ 				// For example encryption needs to initialize the users keys first
+@@ -188,11 +192,11 @@
+ 				OC_Hook::emit(
+ 					'OC_User',
+ 					'post_login',
+ 					[
+ 						'uid' => $uid,
+-						'password' => '',
++						'password' => $password,
+ 						'isTokenLogin' => false,
+ 					]
+ 				);
+ 				/** @var IEventDispatcher $dispatcher */
+ 				$dispatcher = \OC::$server->get(IEventDispatcher::class);
