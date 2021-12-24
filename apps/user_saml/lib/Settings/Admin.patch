@@ -1,8 +1,19 @@
-134c134,138
-< 
----
->           'user_secret_mapping' => [
->               'text' => $this->l10n->t('Attribute to use as user secret e.g. for the encryption app.'),
->               'type' => 'line',
->               'required' => false,
->           ],
+--- Admin.php	2021-12-24 16:10:21.569000000 -0600
++++ Admin.new.php	2021-12-24 16:11:11.918000000 -0600
+@@ -129,11 +129,15 @@
+ 			'home_mapping' => [
+ 				'text' => $this->l10n->t('Attribute to map the users home to.'),
+ 				'type' => 'line',
+ 				'required' => true,
+ 			],
+-
++			'user_secret_mapping' => [
++				'text' => $this->l10n->t('Attribute to use as user secret e.g. for the encryption app.'),
++				'type' => 'line',
++				'required' => false,
++			],
+ 		];
+ 
+ 		$selectedNameIdFormat = $this->config->getAppValue('user_saml', 'sp-name-id-format', Constants::NAMEID_UNSPECIFIED);
+ 		$nameIdFormats = [
+ 			Constants::NAMEID_EMAIL_ADDRESS => [
