@@ -1,5 +1,5 @@
---- UserBackend.php	2021-12-24 16:10:08.547000000 -0600
-+++ UserBackend.new.php	2021-12-24 16:22:11.328000000 -0600
+--- ../apps/user_saml/lib/UserBackend.php	2021-12-26 15:58:39.000000000 +0000
++++ ../apps/class_overrides/apps/user_saml/lib/UserBackend.php	2021-12-26 19:42:21.857288745 +0000
 @@ -32,14 +32,15 @@
  use OCP\UserInterface;
  use OCP\IUserBackend;
@@ -121,7 +121,28 @@
  		return false;
  	}
  
-@@ -598,10 +643,25 @@
+@@ -500,10 +545,20 @@
+ 			return $uid;
+ 		}
+ 		return '';
+ 	}
+ 
++	/**
++	 * Optionally returns a stable per-user secret. This secret is for
++	 * instance used to secure file encryption keys.
++	 * @return string|null
++	 * @since 23.0.0
++	 */
++	public function getCurrentUserSecret(): ?string {
++		$samlData = $this->session->get('user_saml.samlUserData');
++		return $this->getUserSecret($this->getCurrentUserId(), $samlData);
++	}
+ 
+ 	/**
+ 	 * Backend name to be shown in user management
+ 	 * @return string the name of the backend to be shown
+ 	 * @since 8.0.0
+@@ -598,10 +653,25 @@
  		}
  
  		return $value;
@@ -147,7 +168,7 @@
  		$user = $this->userManager->get($uid);
  		try {
  			$newEmail = $this->getAttributeValue('saml-attribute-mapping-email_mapping', $attributes);
-@@ -675,15 +735,20 @@
+@@ -675,15 +745,20 @@
  
  				foreach ($groupsToRemove as $group) {
  					$groupManager->get($group)->removeUser($user);
