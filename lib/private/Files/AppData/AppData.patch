@@ -1,0 +1,106 @@
+--- AppData.php	2022-01-04 15:47:34.485000000 -0600
++++ "AppData copy.php"	2022-01-04 15:52:18.929000000 -0600
+@@ -52,10 +52,13 @@
+ 	private $folder;
+ 
+ 	/** @var (ISimpleFolder|NotFoundException)[]|CappedMemoryCache */
+ 	private $folders;
+ 
++	/** @var string */
++	private $appdataRoot = "";
++
+ 	/**
+ 	 * AppData constructor.
+ 	 *
+ 	 * @param IRootFolder $rootFolder
+ 	 * @param SystemConfig $systemConfig
+@@ -66,10 +69,26 @@
+ 								string $appId) {
+ 		$this->rootFolder = $rootFolder;
+ 		$this->config = $systemConfig;
+ 		$this->appId = $appId;
+ 		$this->folders = new CappedMemoryCache();
++
++		if (in_array('appdataroot',\OC::$server->getSystemConfig()->getKeys())) {				
++			$arguments = [
++				'datadir' => \OC::$server->getSystemConfig()->getValue('appdataroot'),
++			];
++			
++			$storage = new \OC\Files\Storage\LocalRootStorage($arguments);
++			$loader = \OC::$server->query(IStorageFactory::class);
++			$mount = new \OC\Files\Mount\MountPoint($storage, '/appdata/', $arguments, $loader);
++
++			\OC::$server->getMountManager()->addMount($mount);
++			$this->appdataRoot = 'appdata/';
++
++			$this->folders->clear();
++			\OC::$server->getCache()->clear();
++		}
+ 	}
+ 
+ 	private function getAppDataFolderName() {
+ 		$instanceId = $this->config->getValue('instanceid', null);
+ 		if ($instanceId === null) {
+@@ -78,15 +97,15 @@
+ 
+ 		return 'appdata_' . $instanceId;
+ 	}
+ 
+ 	private function getAppDataRootFolder(): Folder {
+-		$name = $this->getAppDataFolderName();
++		$name = $this->appdataRoot . $this->getAppDataFolderName();
+ 
+ 		try {
+ 			/** @var Folder $node */
+-			$node = $this->rootFolder->get($name);
++			$node = $this->rootFolder->get($name);				
+ 			return $node;
+ 		} catch (NotFoundException $e) {
+ 			try {
+ 				return $this->rootFolder->newFolder($name);
+ 			} catch (NotPermittedException $e) {
+@@ -99,11 +118,11 @@
+ 	 * @return Folder
+ 	 * @throws \RuntimeException
+ 	 */
+ 	private function getAppDataFolder(): Folder {
+ 		if ($this->folder === null) {
+-			$name = $this->getAppDataFolderName();
++			$name = $this->appdataRoot . $this->getAppDataFolderName();
+ 
+ 			try {
+ 				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
+ 			} catch (NotFoundException $e) {
+ 				$appDataRootFolder = $this->getAppDataRootFolder();
+@@ -135,11 +154,11 @@
+ 		try {
+ 			// Hardening if somebody wants to retrieve '/'
+ 			if ($name === '/') {
+ 				$node = $this->getAppDataFolder();
+ 			} else {
+-				$path = $this->getAppDataFolderName() . '/' . $this->appId . '/' . $name;
++				$path = $this->appdataRoot . $this->getAppDataFolderName() . '/' . $this->appId . '/' . $name;
+ 				$node = $this->rootFolder->get($path);
+ 			}
+ 		} catch (NotFoundException $e) {
+ 			$this->folders->set($key, $e);
+ 			throw $e;
+@@ -151,11 +170,17 @@
+ 		return $folder;
+ 	}
+ 
+ 	public function newFolder(string $name): ISimpleFolder {
+ 		$key = $this->appId . '/' . $name;
+-		$folder = $this->getAppDataFolder()->newFolder($name);
++
++		if ($this->getAppDataFolder()->nodeExists($name)) {
++			$folder = $this->getAppDataFolder()->get($name);
++		}
++		else {
++			$folder = $this->getAppDataFolder()->newFolder($name);
++		}
+ 
+ 		$simpleFolder = new SimpleFolder($folder);
+ 		$this->folders->set($key, $simpleFolder);
+ 		return $simpleFolder;
+ 	}
