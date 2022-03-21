@@ -1,5 +1,5 @@
---- AppData.php	2022-01-04 15:47:34.485000000 -0600
-+++ "AppData copy.php"	2022-01-04 15:52:18.929000000 -0600
+--- AppData.php.orig	2022-02-27 14:35:32.775000000 -0600
++++ AppData.php	2022-03-12 19:17:05.209000000 -0600
 @@ -52,10 +52,13 @@
  	private $folder;
  
@@ -14,7 +14,7 @@
  	 *
  	 * @param IRootFolder $rootFolder
  	 * @param SystemConfig $systemConfig
-@@ -66,10 +69,26 @@
+@@ -66,10 +69,23 @@
  								string $appId) {
  		$this->rootFolder = $rootFolder;
  		$this->config = $systemConfig;
@@ -32,16 +32,13 @@
 +
 +			\OC::$server->getMountManager()->addMount($mount);
 +			$this->appdataRoot = 'appdata/';
-+
-+			$this->folders->clear();
-+			\OC::$server->getCache()->clear();
 +		}
  	}
  
  	private function getAppDataFolderName() {
  		$instanceId = $this->config->getValue('instanceid', null);
  		if ($instanceId === null) {
-@@ -78,15 +97,15 @@
+@@ -78,15 +94,15 @@
  
  		return 'appdata_' . $instanceId;
  	}
@@ -59,7 +56,7 @@
  			try {
  				return $this->rootFolder->newFolder($name);
  			} catch (NotPermittedException $e) {
-@@ -99,11 +118,11 @@
+@@ -99,11 +115,11 @@
  	 * @return Folder
  	 * @throws \RuntimeException
  	 */
@@ -72,7 +69,24 @@
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
  			} catch (NotFoundException $e) {
  				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -135,11 +154,11 @@
+@@ -122,16 +138,10 @@
+ 
+ 		return $this->folder;
+ 	}
+ 
+ 	public function getFolder(string $name): ISimpleFolder {
+-		try {
+-			$this->rootFolder->newFolder($this->getAppDataFolderName());
+-		} catch (\Exception $e) {
+-			// Do nothing
+-		}
+-
+ 		$key = $this->appId . '/' . $name;
+ 		if ($cachedFolder = $this->folders->get($key)) {
+ 			if ($cachedFolder instanceof \Exception) {
+ 				throw $cachedFolder;
+ 			} else {
+@@ -141,18 +151,26 @@
  		try {
  			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
@@ -85,22 +99,18 @@
  		} catch (NotFoundException $e) {
  			$this->folders->set($key, $e);
  			throw $e;
-@@ -151,11 +170,17 @@
- 		return $folder;
- 	}
+ 		}
  
- 	public function newFolder(string $name): ISimpleFolder {
- 		$key = $this->appId . '/' . $name;
--		$folder = $this->getAppDataFolder()->newFolder($name);
++		try {
++			$this->getAppDataRootFolder()->newFolder($key);
++			$this->getAppDataRootFolder()->delete($key);
++			throw new NotFoundException;
++		} catch (NotPermittedException $e) {
++			// Do nothing
++		}
 +
-+		if ($this->getAppDataFolder()->nodeExists($name)) {
-+			$folder = $this->getAppDataFolder()->get($name);
-+		}
-+		else {
-+			$folder = $this->getAppDataFolder()->newFolder($name);
-+		}
- 
- 		$simpleFolder = new SimpleFolder($folder);
- 		$this->folders->set($key, $simpleFolder);
- 		return $simpleFolder;
+ 		/** @var Folder $node */
+ 		$folder = new SimpleFolder($node);
+ 		$this->folders->set($key, $folder);
+ 		return $folder;
  	}
