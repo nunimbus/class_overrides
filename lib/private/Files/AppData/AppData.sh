@@ -8,6 +8,9 @@ sourceFile="${DIR}/${sourceFilePart}.php"
 patchFile="${DIR}/${sourceFilePart}.patch"
 
 patch "$sourceFile" "$patchFile"
+if [ $? -eq 1 ]
+  then exit
+fi
 
 rm "${DIR}/${FILE}"
 rm "$patchFile"
