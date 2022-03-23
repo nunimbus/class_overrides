@@ -1,4 +1,4 @@
---- AppData.php.orig	2022-02-27 14:35:32.775000000 -0600
+--- AppData.php.orig	2022-03-23 12:40:50.821000000 -0500
 +++ AppData.php	2022-03-12 19:17:05.209000000 -0600
 @@ -52,10 +52,13 @@
  	private $folder;
@@ -69,24 +69,7 @@
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
  			} catch (NotFoundException $e) {
  				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -122,16 +138,10 @@
- 
- 		return $this->folder;
- 	}
- 
- 	public function getFolder(string $name): ISimpleFolder {
--		try {
--			$this->rootFolder->newFolder($this->getAppDataFolderName());
--		} catch (\Exception $e) {
--			// Do nothing
--		}
--
- 		$key = $this->appId . '/' . $name;
- 		if ($cachedFolder = $this->folders->get($key)) {
- 			if ($cachedFolder instanceof \Exception) {
- 				throw $cachedFolder;
- 			} else {
-@@ -141,18 +151,26 @@
+@@ -135,18 +151,26 @@
  		try {
  			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
@@ -114,3 +97,12 @@
  		$this->folders->set($key, $folder);
  		return $folder;
  	}
+@@ -176,6 +200,6 @@
+ 	}
+ 
+ 	public function getId(): int {
+ 		return $this->getAppDataFolder()->getId();
+ 	}
+-}
+\ No newline at end of file
++}
