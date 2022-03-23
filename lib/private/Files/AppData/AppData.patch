@@ -1,5 +1,5 @@
---- AppData.php.orig	2022-03-23 12:40:50.821000000 -0500
-+++ AppData.php	2022-03-12 19:17:05.209000000 -0600
+--- AppData.php	2021-11-15 19:53:50.000000000 +0000
++++ AppData.new.php	2022-03-23 17:47:41.340420907 +0000
 @@ -52,10 +52,13 @@
  	private $folder;
  
@@ -97,12 +97,3 @@
  		$this->folders->set($key, $folder);
  		return $folder;
  	}
-@@ -176,6 +200,6 @@
- 	}
- 
- 	public function getId(): int {
- 		return $this->getAppDataFolder()->getId();
- 	}
--}
-\ No newline at end of file
-+}
