@@ -1,4 +1,4 @@
---- AppData.php.orig	2022-03-29 16:32:24.607000000 -0500
+--- AppData.php.orig	2022-03-29 16:47:16.728000000 -0500
 +++ AppData.php	2022-03-29 16:28:47.354000000 -0500
 @@ -34,10 +34,11 @@
  use OCP\Files\IRootFolder;
@@ -50,19 +50,21 @@
  	private function getAppDataFolderName() {
  		$instanceId = $this->config->getValue('instanceid', null);
  		if ($instanceId === null) {
-@@ -78,15 +95,15 @@
+@@ -77,16 +94,16 @@
+ 		}
  
  		return 'appdata_' . $instanceId;
  	}
  
- 	private function getAppDataRootFolder(): Folder {
+-	protected function getAppDataRootFolder(): Folder {
 -		$name = $this->getAppDataFolderName();
++	private function getAppDataRootFolder(): Folder {
 +		$name = $this->appdataRoot . $this->getAppDataFolderName();
  
  		try {
  			/** @var Folder $node */
 -			$node = $this->rootFolder->get($name);
-+			$node = $this->rootFolder->get($name);			
++			$node = $this->rootFolder->get($name);				
  			return $node;
  		} catch (NotFoundException $e) {
  			try {
