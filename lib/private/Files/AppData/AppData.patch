@@ -1,8 +1,6 @@
 --- AppData.php.orig	2022-03-29 16:47:16.728000000 -0500
 +++ AppData.php	2022-03-29 16:55:29.401000000 -0500
-@@ -34,10 +34,11 @@
- use OCP\Files\IRootFolder;
- use OCP\Files\Node;
+@@ -36,6 +36,7 @@
  use OCP\Files\NotFoundException;
  use OCP\Files\NotPermittedException;
  use OCP\Files\SimpleFS\ISimpleFolder;
@@ -10,11 +8,7 @@
  
  class AppData implements IAppData {
  
- 	/** @var IRootFolder */
- 	private $rootFolder;
-@@ -52,10 +53,13 @@
- 	private $folder;
- 
+@@ -54,6 +55,9 @@
  	/** @var (ISimpleFolder|NotFoundException)[]|CappedMemoryCache */
  	private $folders;
  
@@ -24,11 +18,7 @@
  	/**
  	 * AppData constructor.
  	 *
- 	 * @param IRootFolder $rootFolder
- 	 * @param SystemConfig $systemConfig
-@@ -66,10 +70,23 @@
- 								string $appId) {
- 		$this->rootFolder = $rootFolder;
+@@ -68,6 +72,19 @@
  		$this->config = $systemConfig;
  		$this->appId = $appId;
  		$this->folders = new CappedMemoryCache();
@@ -48,11 +38,7 @@
  	}
  
  	private function getAppDataFolderName() {
- 		$instanceId = $this->config->getValue('instanceid', null);
- 		if ($instanceId === null) {
-@@ -78,15 +95,15 @@
- 
- 		return 'appdata_' . $instanceId;
+@@ -80,11 +97,11 @@
  	}
  
  	protected function getAppDataRootFolder(): Folder {
@@ -66,11 +52,7 @@
  			return $node;
  		} catch (NotFoundException $e) {
  			try {
- 				return $this->rootFolder->newFolder($name);
- 			} catch (NotPermittedException $e) {
-@@ -99,11 +116,11 @@
- 	 * @return Folder
- 	 * @throws \RuntimeException
+@@ -101,7 +118,7 @@
  	 */
  	private function getAppDataFolder(): Folder {
  		if ($this->folder === null) {
@@ -79,11 +61,7 @@
  
  			try {
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
- 			} catch (NotFoundException $e) {
- 				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -135,18 +152,26 @@
- 		try {
- 			// Hardening if somebody wants to retrieve '/'
+@@ -137,7 +154,7 @@
  			if ($name === '/') {
  				$node = $this->getAppDataFolder();
  			} else {
@@ -92,7 +70,7 @@
  				$node = $this->rootFolder->get($path);
  			}
  		} catch (NotFoundException $e) {
- 			$this->folders->set($key, $e);
+@@ -145,6 +162,14 @@
  			throw $e;
  		}
  
@@ -107,11 +85,7 @@
  		/** @var Folder $node */
  		$folder = new SimpleFolder($node);
  		$this->folders->set($key, $folder);
- 		return $folder;
- 	}
-@@ -176,6 +201,6 @@
- 	}
- 
+@@ -178,4 +203,4 @@
  	public function getId(): int {
  		return $this->getAppDataFolder()->getId();
  	}
