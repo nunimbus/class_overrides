@@ -1,6 +1,18 @@
---- AppData.php	2021-11-15 19:53:50.000000000 +0000
-+++ AppData.new.php	2022-03-23 17:47:41.340420907 +0000
-@@ -52,10 +52,13 @@
+--- AppData.php.orig	2022-03-29 16:32:24.607000000 -0500
++++ AppData.php	2022-03-29 16:28:47.354000000 -0500
+@@ -34,10 +34,11 @@
+ use OCP\Files\IRootFolder;
+ use OCP\Files\Node;
+ use OCP\Files\NotFoundException;
+ use OCP\Files\NotPermittedException;
+ use OCP\Files\SimpleFS\ISimpleFolder;
++use OCP\Files\Storage\IStorageFactory;
+ 
+ class AppData implements IAppData {
+ 
+ 	/** @var IRootFolder */
+ 	private $rootFolder;
+@@ -52,10 +53,13 @@
  	private $folder;
  
  	/** @var (ISimpleFolder|NotFoundException)[]|CappedMemoryCache */
@@ -14,7 +26,7 @@
  	 *
  	 * @param IRootFolder $rootFolder
  	 * @param SystemConfig $systemConfig
-@@ -66,10 +69,23 @@
+@@ -66,10 +70,23 @@
  								string $appId) {
  		$this->rootFolder = $rootFolder;
  		$this->config = $systemConfig;
@@ -38,7 +50,7 @@
  	private function getAppDataFolderName() {
  		$instanceId = $this->config->getValue('instanceid', null);
  		if ($instanceId === null) {
-@@ -78,15 +94,15 @@
+@@ -78,15 +95,15 @@
  
  		return 'appdata_' . $instanceId;
  	}
@@ -50,13 +62,13 @@
  		try {
  			/** @var Folder $node */
 -			$node = $this->rootFolder->get($name);
-+			$node = $this->rootFolder->get($name);				
++			$node = $this->rootFolder->get($name);			
  			return $node;
  		} catch (NotFoundException $e) {
  			try {
  				return $this->rootFolder->newFolder($name);
  			} catch (NotPermittedException $e) {
-@@ -99,11 +115,11 @@
+@@ -99,11 +116,11 @@
  	 * @return Folder
  	 * @throws \RuntimeException
  	 */
@@ -69,7 +81,7 @@
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
  			} catch (NotFoundException $e) {
  				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -135,18 +151,26 @@
+@@ -135,18 +152,26 @@
  		try {
  			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
@@ -97,3 +109,12 @@
  		$this->folders->set($key, $folder);
  		return $folder;
  	}
+@@ -176,6 +201,6 @@
+ 	}
+ 
+ 	public function getId(): int {
+ 		return $this->getAppDataFolder()->getId();
+ 	}
+-}
+\ No newline at end of file
++}
