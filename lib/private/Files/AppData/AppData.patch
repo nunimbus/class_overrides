@@ -1,6 +1,8 @@
---- AppData.php.orig	2022-03-29 16:47:16.728000000 -0500
-+++ AppData.php	2022-03-29 16:55:29.401000000 -0500
-@@ -36,6 +36,7 @@
+--- AppData.php.orig	2022-03-30 00:08:33.868892756 +0000
++++ AppData.new	2022-03-30 00:09:58.647890409 +0000
+@@ -34,10 +34,11 @@
+ use OCP\Files\IRootFolder;
+ use OCP\Files\Node;
  use OCP\Files\NotFoundException;
  use OCP\Files\NotPermittedException;
  use OCP\Files\SimpleFS\ISimpleFolder;
@@ -8,7 +10,11 @@
  
  class AppData implements IAppData {
  
-@@ -54,6 +55,9 @@
+ 	/** @var IRootFolder */
+ 	private $rootFolder;
+@@ -52,10 +53,13 @@
+ 	private $folder;
+ 
  	/** @var (ISimpleFolder|NotFoundException)[]|CappedMemoryCache */
  	private $folders;
  
@@ -18,12 +24,16 @@
  	/**
  	 * AppData constructor.
  	 *
-@@ -68,6 +72,19 @@
+ 	 * @param IRootFolder $rootFolder
+ 	 * @param SystemConfig $systemConfig
+@@ -66,10 +70,23 @@
+ 								string $appId) {
+ 		$this->rootFolder = $rootFolder;
  		$this->config = $systemConfig;
  		$this->appId = $appId;
  		$this->folders = new CappedMemoryCache();
 +
-+		if (in_array('appdataroot',\OC::$server->getSystemConfig()->getKeys())) {				
++		if (in_array('appdataroot',\OC::$server->getSystemConfig()->getKeys())) {		
 +			$arguments = [
 +				'datadir' => \OC::$server->getSystemConfig()->getValue('appdataroot'),
 +			];
@@ -38,11 +48,17 @@
  	}
  
  	private function getAppDataFolderName() {
-@@ -80,11 +97,11 @@
+ 		$instanceId = $this->config->getValue('instanceid', null);
+ 		if ($instanceId === null) {
+@@ -77,16 +94,16 @@
+ 		}
+ 
+ 		return 'appdata_' . $instanceId;
  	}
  
- 	protected function getAppDataRootFolder(): Folder {
+-	private function getAppDataRootFolder(): Folder {
 -		$name = $this->getAppDataFolderName();
++	protected function getAppDataRootFolder(): Folder {
 +		$name = $this->appdataRoot . $this->getAppDataFolderName();
  
  		try {
@@ -52,7 +68,11 @@
  			return $node;
  		} catch (NotFoundException $e) {
  			try {
-@@ -101,7 +118,7 @@
+ 				return $this->rootFolder->newFolder($name);
+ 			} catch (NotPermittedException $e) {
+@@ -99,11 +116,11 @@
+ 	 * @return Folder
+ 	 * @throws \RuntimeException
  	 */
  	private function getAppDataFolder(): Folder {
  		if ($this->folder === null) {
@@ -61,7 +81,11 @@
  
  			try {
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
-@@ -137,7 +154,7 @@
+ 			} catch (NotFoundException $e) {
+ 				$appDataRootFolder = $this->getAppDataRootFolder();
+@@ -135,18 +152,26 @@
+ 		try {
+ 			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
  				$node = $this->getAppDataFolder();
  			} else {
@@ -70,7 +94,7 @@
  				$node = $this->rootFolder->get($path);
  			}
  		} catch (NotFoundException $e) {
-@@ -145,6 +162,14 @@
+ 			$this->folders->set($key, $e);
  			throw $e;
  		}
  
@@ -85,10 +109,12 @@
  		/** @var Folder $node */
  		$folder = new SimpleFolder($node);
  		$this->folders->set($key, $folder);
-@@ -178,4 +203,4 @@
+ 		return $folder;
+ 	}
+@@ -177,5 +202,6 @@
+ 
  	public function getId(): int {
  		return $this->getAppDataFolder()->getId();
  	}
--}
-\ No newline at end of file
-+}
+ }
++
