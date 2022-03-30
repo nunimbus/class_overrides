@@ -1,5 +1,5 @@
---- AppData.php.orig	2022-03-30 00:08:33.868892756 +0000
-+++ AppData.new	2022-03-30 00:09:58.647890409 +0000
+--- AppData.php	2021-11-15 19:53:50.000000000 +0000
++++ AppData.new	2022-03-30 00:45:47.421235136 +0000
 @@ -34,10 +34,11 @@
  use OCP\Files\IRootFolder;
  use OCP\Files\Node;
@@ -83,7 +83,7 @@
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
  			} catch (NotFoundException $e) {
  				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -135,18 +152,26 @@
+@@ -135,18 +152,31 @@
  		try {
  			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
@@ -98,20 +98,25 @@
  			throw $e;
  		}
  
-+		try {
-+			$this->getAppDataRootFolder()->newFolder($key);
-+			$this->getAppDataRootFolder()->delete($key);
++		$mountPoint = $this->getAppDataFolder()->getStorage()->getMountPoint();
++
++		if (! \OC::$server->getMountManager()->find($mountPoint)->getStorage()->file_exists($this->getAppDataFolderName() . '/' . $key)) {
 +			throw new NotFoundException;
-+		} catch (NotPermittedException $e) {
-+			// Do nothing
 +		}
++//		try {
++//			$this->getAppDataRootFolder()->newFolder($key);
++//			$this->getAppDataRootFolder()->delete($key);
++//			throw new NotFoundException;
++//		} catch (NotPermittedException $e) {
++//			// Do nothing
++//		}
 +
  		/** @var Folder $node */
  		$folder = new SimpleFolder($node);
  		$this->folders->set($key, $folder);
  		return $folder;
  	}
-@@ -177,5 +202,6 @@
+@@ -177,5 +207,6 @@
  
  	public function getId(): int {
  		return $this->getAppDataFolder()->getId();
