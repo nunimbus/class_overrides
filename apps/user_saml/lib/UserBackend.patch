@@ -1,6 +1,6 @@
---- ../apps/user_saml/lib/UserBackend.php	2021-12-26 15:58:39.000000000 +0000
-+++ ../apps/class_overrides/apps/user_saml/lib/UserBackend.php	2021-12-26 19:42:21.857288745 +0000
-@@ -32,14 +32,15 @@
+--- UserBackend.php	2022-04-30 12:44:50.844000000 -0500
++++ UserBackend-mod.php	2022-04-30 12:43:29.495000000 -0500
+@@ -32,15 +32,16 @@
  use OCP\UserInterface;
  use OCP\IUserBackend;
  use OCP\IConfig;
@@ -8,7 +8,8 @@
  use OCP\ISession;
 +use OCP\Authentication\IProvideUserSecretBackend;
  use Symfony\Component\EventDispatcher\GenericEvent;
- use function base64_decode;
+ use OCP\EventDispatcher\IEventDispatcher;
+ use OCP\User\Events\UserChangedEvent;
  
 -class UserBackend implements IApacheBackend, UserInterface, IUserBackend {
 +class UserBackend implements IApacheBackend, UserInterface, IUserBackend, IProvideUserSecretBackend {
@@ -17,8 +18,8 @@
  	/** @var IURLGenerator */
  	private $urlGenerator;
  	/** @var ISession */
-@@ -141,15 +142,67 @@
- 			foreach($values as $column => $value) {
+@@ -146,14 +147,67 @@
+ 			foreach ($values as $column => $value) {
  				$qb->setValue($column, $qb->createNamedParameter($value));
  			}
  			$qb->execute();
@@ -31,7 +32,6 @@
 +				\OC_Hook::emit('OC_User', 'post_login', ['run' => true, 'uid' => $uid, 'password' => $userSecret, 'isTokenLogin' => false]);
 +			}
  			$this->initializeHomeDir($uid);
--
  		}
  	}
  
@@ -86,19 +86,20 @@
  	 * @throws \OCP\Files\NotFoundException
  	 */
  	public function initializeHomeDir($uid) {
-@@ -189,27 +242,19 @@
+@@ -193,29 +247,21 @@
  	 * @param string $uid The username
  	 * @param string $password The password
  	 * @return string
  	 *
  	 * Check if the password is correct without logging in the user
 -	 * returns the user id or false
+-	 */
 +	 * returns the user id or false.
 +	 *
 +	 * By default user_saml tokens are passwordless and this function
 +	 * is unused. It is only called if we have tokens with passwords,
 +	 * which happens if we have SSO provided user secrets.
- 	 */
++ 	 */
  	public function checkPassword($uid, $password) {
 -		/* @var $qb IQueryBuilder */
 -		$qb = $this->db->getQueryBuilder();
@@ -110,24 +111,27 @@
 -		$data = $result->fetchAll();
 -		$result->closeCursor();
 -
--		foreach($data as $passwords) {
--			if(password_verify($password, $passwords['token'])) {
+-		foreach ($data as $passwords) {
+-			if (password_verify($password, $passwords['token'])) {
 -				return $uid;
 -			}
+-		}
+-
 +	    if ($this->checkUserSecretHash($uid, $password)) {
 +			return $uid;
- 		}
- 
++ 		}
++ 
  		return false;
  	}
  
-@@ -500,10 +545,20 @@
- 			return $uid;
- 		}
+ 	/**
+ 	 * delete a user
+@@ -506,10 +552,21 @@
  		return '';
  	}
  
-+	/**
+ 
+ 	/**
 +	 * Optionally returns a stable per-user secret. This secret is for
 +	 * instance used to secure file encryption keys.
 +	 * @return string|null
@@ -137,12 +141,14 @@
 +		$samlData = $this->session->get('user_saml.samlUserData');
 +		return $this->getUserSecret($this->getCurrentUserId(), $samlData);
 +	}
- 
- 	/**
++
++	/**
  	 * Backend name to be shown in user management
  	 * @return string the name of the backend to be shown
  	 * @since 8.0.0
-@@ -598,10 +653,25 @@
+ 	 */
+ 	public function getBackendName() {
+@@ -604,10 +661,25 @@
  		}
  
  		return $value;
@@ -168,7 +174,7 @@
  		$user = $this->userManager->get($uid);
  		try {
  			$newEmail = $this->getAttributeValue('saml-attribute-mapping-email_mapping', $attributes);
-@@ -675,15 +745,20 @@
+@@ -675,15 +747,20 @@
  
  				foreach ($groupsToRemove as $group) {
  					$groupManager->get($group)->removeUser($user);
