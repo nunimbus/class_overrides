@@ -1,0 +1,14 @@
+--- SAMLSettings.php	2022-05-07 20:34:35.766642779 +0000
++++ SAMLSettings.new.php	2022-05-07 20:34:25.846781487 +0000
+@@ -63,10 +63,11 @@
+ 		'saml-attribute-mapping-displayName_mapping',
+ 		'saml-attribute-mapping-email_mapping',
+ 		'saml-attribute-mapping-group_mapping',
+ 		'saml-attribute-mapping-home_mapping',
+ 		'saml-attribute-mapping-quota_mapping',
++		'saml-attribute-mapping-user-secret',
+ 		'sp-x509cert',
+ 		'sp-name-id-format',
+ 		'sp-privateKey',
+ 	];
+ 
