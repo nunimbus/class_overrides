@@ -37,7 +37,7 @@
 +			$arguments = [
 +				'datadir' => \OC::$server->getSystemConfig()->getValue('appdataroot'),
 +			];
-+			
++			// Have to use `appdata_[instanceid]` as the root because of `OC\Encryption\Util->getUidAndFilename()`
 +			$storage = new \OC\Files\Storage\LocalRootStorage($arguments);
 +			$loader = \OC::$server->query(IStorageFactory::class);
 +			$mount = new \OC\Files\Mount\MountPoint($storage, '/appdata_' . \OC::$server->getSystemConfig()->getValue('instanceid') . '/', $arguments, $loader);
