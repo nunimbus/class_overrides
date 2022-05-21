@@ -40,10 +40,10 @@
 +			
 +			$storage = new \OC\Files\Storage\LocalRootStorage($arguments);
 +			$loader = \OC::$server->query(IStorageFactory::class);
-+			$mount = new \OC\Files\Mount\MountPoint($storage, '/appdata/', $arguments, $loader);
++			$mount = new \OC\Files\Mount\MountPoint($storage, '/appdata_' . \OC::$server->getSystemConfig()->getValue('instanceid') . '/', $arguments, $loader);
 +
 +			\OC::$server->getMountManager()->addMount($mount);
-+			$this->appdataRoot = 'appdata/';
++			$this->appdataRoot = 'appdata_' . \OC::$server->getSystemConfig()->getValue('instanceid') . '/';
 +		}
  	}
  
