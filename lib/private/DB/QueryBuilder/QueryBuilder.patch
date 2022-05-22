@@ -1,5 +1,5 @@
---- QueryBuilder.php	2021-11-15 13:53:50.000000000 -0600
-+++ QueryBuilder.new.php	2021-12-24 10:41:38.029000000 -0600
+--- QueryBuilder.php	2022-05-22 16:49:11.419000000 -0500
++++ QueryBuilder.patched.php	2022-05-22 16:54:16.747000000 -0500
 @@ -52,10 +52,13 @@
  use OCP\DB\QueryBuilder\ILiteral;
  use OCP\DB\QueryBuilder\IParameter;
@@ -66,3 +66,4 @@
  		}
  		return new ResultAdapter($result);
  	}
+
