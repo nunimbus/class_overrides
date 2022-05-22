@@ -1,5 +1,5 @@
---- OC_User.php	2021-11-15 13:53:50.000000000 -0600
-+++ OC_User.new.php	2021-12-24 10:49:23.393000000 -0600
+--- OC_User.php	2022-05-22 17:38:32.827000000 -0500
++++ OC_User.patched.php	2022-05-22 17:42:34.358000000 -0500
 @@ -176,11 +176,15 @@
  					$message = \OC::$server->getL10N('lib')->t('User disabled');
  					throw new LoginException($message);
@@ -23,7 +23,7 @@
  					'post_login',
  					[
  						'uid' => $uid,
--						'password' => '',
+-						'password' => null,
 +						'password' => $password,
  						'isTokenLogin' => false,
  					]

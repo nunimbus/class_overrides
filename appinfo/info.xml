@@ -15,6 +15,6 @@
 	</types>
 	<category>tools</category>
 	<dependencies>
-		<nextcloud min-version="20" max-version="23" />
+		<nextcloud min-version="20" max-version="24" />
 	</dependencies>
 </info>
