@@ -1,0 +1,18 @@
+53,55c53
+<         $dirPath = "appdata_" . \OC::$server->getConfig()->GetSystemValue("instanceid", null)
+<                                 . "/" . self::$appName
+<                                 . "/" . self::$templateFolderName;
+---
+>         $appDataDir = \OC::$server->getAppDataDir('onlyoffice');
+57,58d54
+<         $rootFolder = \OC::$server->getRootFolder();
+<         $templateDir = null;
+60c56
+<             $templateDir = $rootFolder->get($dirPath);
+---
+>             $templateDir = $appDataDir->getFolder('template');
+62c58,59
+<             $templateDir = $rootFolder->newFolder($dirPath);
+---
+>             // creating onlyoffice template appdata folder
+>             $templateDir = $appDataDir->newFolder('template');
