@@ -94,7 +94,7 @@
 +		$mountPoint = $this->getAppDataFolder()->getMountPoint()->getMountPoint();
 +
 +		if (! \OC::$server->getMountManager()->find($mountPoint)->getStorage()->file_exists($this->getAppDataFolderName() . '/' . $key)) {
-+			$this->getAppDataRootFolder()->newFolder($key);
++			throw new NotFoundException;
 +		}
 +//		try {
 +//			$this->getAppDataRootFolder()->newFolder($key);
