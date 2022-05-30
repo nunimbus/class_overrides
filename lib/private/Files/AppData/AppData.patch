@@ -1,5 +1,5 @@
---- AppData.php	2022-05-22 17:38:22.593000000 -0500
-+++ AppData.patched.php	2022-05-22 17:41:50.504000000 -0500
+--- lib/private/Files/AppData/AppData.php	2022-05-19 12:04:48.000000000 +0000
++++ AppData.php	2022-05-30 04:30:00.842746615 +0000
 @@ -34,10 +34,11 @@
  use OCP\Files\IRootFolder;
  use OCP\Files\Node;
@@ -76,7 +76,7 @@
  				$this->folder = $this->rootFolder->get($name . '/' . $this->appId);
  			} catch (NotFoundException $e) {
  				$appDataRootFolder = $this->getAppDataRootFolder();
-@@ -135,18 +152,31 @@
+@@ -135,18 +152,29 @@
  		try {
  			// Hardening if somebody wants to retrieve '/'
  			if ($name === '/') {
@@ -94,15 +94,13 @@
 +		$mountPoint = $this->getAppDataFolder()->getMountPoint()->getMountPoint();
 +
 +		if (! \OC::$server->getMountManager()->find($mountPoint)->getStorage()->file_exists($this->getAppDataFolderName() . '/' . $key)) {
-+			throw new NotFoundException;
++			if ($key == 'appstore//') {
++				\OC::$server->getMountManager()->find($mountPoint)->getStorage()->mkdir($this->getAppDataFolderName() . '/' . $key);
++			}
++			else {
++				throw new NotFoundException;
++			}
 +		}
-+//		try {
-+//			$this->getAppDataRootFolder()->newFolder($key);
-+//			$this->getAppDataRootFolder()->delete($key);
-+//			throw new NotFoundException;
-+//		} catch (NotPermittedException $e) {
-+//			// Do nothing
-+//		}
 +
  		/** @var Folder $node */
  		$folder = new SimpleFolder($node);
