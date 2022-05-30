@@ -1,18 +1,40 @@
-53,55c53
-<         $dirPath = "appdata_" . \OC::$server->getConfig()->GetSystemValue("instanceid", null)
-<                                 . "/" . self::$appName
-<                                 . "/" . self::$templateFolderName;
----
->         $appDataDir = \OC::$server->getAppDataDir('onlyoffice');
-57,58d54
-<         $rootFolder = \OC::$server->getRootFolder();
-<         $templateDir = null;
-60c56
-<             $templateDir = $rootFolder->get($dirPath);
----
->             $templateDir = $appDataDir->getFolder('template');
-62c58,59
-<             $templateDir = $rootFolder->newFolder($dirPath);
----
->             // creating onlyoffice template appdata folder
->             $templateDir = $appDataDir->newFolder('template');
+--- /usr/src/nextcloud/apps/onlyoffice/lib/templatemanager.php	2022-05-23 16:48:50.000000000 +0000
++++ apps/class_overrides/apps/onlyoffice/lib/templatemanager.php	2022-05-30 04:46:52.504395134 +0000
+@@ -48,20 +48,17 @@
+      * Get global template directory
+      *
+      * @return Folder
+      */
+     public static function GetGlobalTemplateDir() {
+-        $dirPath = "appdata_" . \OC::$server->getConfig()->GetSystemValue("instanceid", null)
+-                                . "/" . self::$appName
+-                                . "/" . self::$templateFolderName;
++        $appDataDir = \OC::$server->getAppDataDir('onlyoffice');
+ 
+-        $rootFolder = \OC::$server->getRootFolder();
+-        $templateDir = null;
+         try {
+-            $templateDir = $rootFolder->get($dirPath);
++            $templateDir = $appDataDir->getFolder('template');
+         } catch (NotFoundException $e) {
+-            $templateDir = $rootFolder->newFolder($dirPath);
++            // creating onlyoffice template appdata folder
++            $templateDir = $appDataDir->newFolder('template');
+         }
+ 
+         return $templateDir;
+     }
+ 
+@@ -222,11 +219,11 @@
+     public static function GetEmptyTemplatePath($lang, $ext) {
+         if (!array_key_exists($lang, self::$localPath)) {
+             $lang = "en";
+         }
+ 
+-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . self::$localPath[$lang] . DIRECTORY_SEPARATOR . "new" . $ext;
++        return dirname(__DIR__) . '/../../../onlyoffice' . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . self::$localPath[$lang] . DIRECTORY_SEPARATOR . "new" . $ext;
+     }
+ 
+     /**
+      * Mapping local path to templates
+      *
