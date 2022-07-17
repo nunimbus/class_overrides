@@ -6,7 +6,7 @@
  		'saml-attribute-mapping-group_mapping',
  		'saml-attribute-mapping-home_mapping',
  		'saml-attribute-mapping-quota_mapping',
-+		'saml-attribute-mapping-user-secret',
++		'saml-attribute-mapping-user_secret_mapping',
  		'sp-x509cert',
  		'sp-name-id-format',
  		'sp-privateKey',
