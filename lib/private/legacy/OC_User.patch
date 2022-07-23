@@ -1,5 +1,5 @@
---- OC_User.php	2022-05-22 17:38:32.827000000 -0500
-+++ OC_User.patched.php	2022-05-22 17:42:34.358000000 -0500
+--- OC_User.php	2022-07-23 15:48:15.064000000 -0500
++++ OC_User.patched.php	2022-07-23 15:50:49.411000000 -0500
 @@ -176,11 +176,15 @@
  					$message = \OC::$server->getL10N('lib')->t('User disabled');
  					throw new LoginException($message);
@@ -12,12 +12,12 @@
 +					$password = $backend->getCurrentUserSecret();
 +				}
 +				$userSession->createSessionToken($request, $uid, $uid, $password);
+ 				$userSession->createRememberMeToken($userSession->getUser());
  				// setup the filesystem
  				OC_Util::setupFS($uid);
  				// first call the post_login hooks, the login-process needs to be
  				// completed before we can safely create the users folder.
- 				// For example encryption needs to initialize the users keys first
-@@ -188,11 +192,11 @@
+@@ -189,11 +193,11 @@
  				OC_Hook::emit(
  					'OC_User',
  					'post_login',
